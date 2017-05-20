@@ -31,9 +31,9 @@ public:
 
 	void push_front(const T& val) {
 		/* Completar. Debe ser atómico. */
-		atomic<Nodo> nuevo = Nodo(val);//creo el nodo nuevo a agregar al comienzo de la lista
 		mtx.lock();//lock para agregar a la lista
-		nuevo->_next = _head;//asigno como siguiente del nuevo nodo al primero de la lista
+		Nodo nuevo = Nodo(val);//creo el nodo nuevo a agregar al comienzo de la lista
+		nuevo._next = _head;//asigno como siguiente del nuevo nodo al primero de la lista
 		this->_head = &(nuevo);//asigno al nuevo nodo como primero de la Lista
 		mtx.unlock();//ya agregué, entonces unlock
 	}

@@ -2,16 +2,58 @@
 #include "ConcurrentHashMap.hpp"
 #include <iostream>
 #include <string>
+#include <mutex>
+
+using namespace std;
 
 void ConcurrentHashMap::addAndInc(string key){
 	char PrimeraLetra = key[0];
-	//int pos = dameIndice
-	//lock()
+	int indice = dameIndice(PrimeraLetra);
+	
+	Lista < ParClaveApariciones > *lista = &tabla[indice];
+	mutex mtx;
+	mtx.lock();
+	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 
+	//iterador tiene una lista y un nodo siguiente
+	//arranca con esta lista y como nodo siguiente el head de lista.
+	//vamos a iterar una lista de ClaveAparicion
+	bool encontrada = false;
+	while(iterador.HaySiguiente() && !encontrada){
+		ParClaveApariciones parClaveApariciones = iterador.Siguiente();
+		if (parClaveApariciones.dameClave() == key ) 
+		{
+			encontrada = true;
+			parClaveApariciones.aumentarApariciones();
+		}
+		iterador.Avanzar();
+	}
+	if(!encontrada)
+	{
+		ParClaveApariciones parNuevo = ParClaveApariciones(key,1);
+		lista->push_front(parNuevo);
+	}
+	mtx.unlock();
+	
 }
 
-bool ConcurrentHashMap::member(clave key){
+bool ConcurrentHashMap::member(string key){
 	bool res = false;
+	//me pasan una key
+	//qvq <key,x> existe
+	char primeraLetra = key[0];
+	int indice = dameIndice(primeraLetra);
+	//ahora buscamos en la tabla si está el par <key,x>
+	Lista < ParClaveApariciones > *lista = &tabla[indice];
+	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
+	//iterador tiene una lista y un nodo siguiente
+	//arranca con esta lista y como nodo siguiente el head de lista.
+	//vamos a iterar una lista de ClaveAparicion
+	while(iterador.HaySiguiente()){
+		ParClaveApariciones parClaveApariciones = iterador.Siguiente();
+		if (parClaveApariciones.dameClave() == key ) return true;
+		iterador.Avanzar();
+	}
 	return res;
 }
 
