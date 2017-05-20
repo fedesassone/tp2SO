@@ -3,21 +3,42 @@
 
 #include "ListaAtomica.hpp"
 #include <vector>
+#include <string>
 
 using namespace std;
 
-typedef int apariciones;
-typedef string clave;
+
+
+class ParClaveApariciones{
+private:
+	int apariciones;
+ 	string clave;
+public:
+	ParClaveApariciones(string clave,int apariciones)
+	{
+		this->clave = clave;
+		this->apariciones = apariciones;
+	}
+	string dameClave(){
+		return this->clave;
+	}
+	int dameApariciones(){
+		return this->apariciones;
+	}
+	void aumentarApariciones(){
+		this->apariciones++;
+	}
+
+};
 
 class ConcurrentHashMap{
 private:
-	vector < Lista < pair<clave,apariciones> > > tabla{26};
-
+	vector < Lista < ParClaveApariciones > > tabla{26};
 public:
 	ConcurrentHashMap(){};//Constructor por defecto
 	
 	void addAndInc(string key);
-	bool member(clave key);
+	bool member(string key);
 
 };
 
