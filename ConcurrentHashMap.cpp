@@ -5,9 +5,47 @@
 
 void ConcurrentHashMap::addAndInc(string key){
 	char PrimeraLetra = key[0];
+	//int pos = dameIndice
+	//lock()
+
 }
 
 bool ConcurrentHashMap::member(clave key){
 	bool res = false;
 	return res;
+}
+
+int dameIndice(char a){
+	int indice;
+	switch(a) 
+	{ 
+	   case 'a': indice = 0;
+	   case 'b': indice = 1;
+	   case 'c': indice = 2;
+	   case 'd': indice = 3;
+	   case 'e': indice = 4;
+	   case 'f': indice = 5;
+	   case 'g': indice = 6;
+	   case 'h': indice = 7;
+	   case 'i': indice = 8;
+	   case 'j': indice = 9;
+	   case 'k': indice = 10;
+	   case 'l': indice = 11;
+	   case 'm': indice = 12;
+	   case 'n': indice = 13;
+	   case 'o': indice = 14;
+	   case 'p': indice = 15;
+	   case 'q': indice = 16;
+	   case 'r': indice = 17;
+	   case 's': indice = 18;
+	   case 't': indice = 19;
+	   case 'u': indice = 20;
+	   case 'v': indice = 21;
+	   case 'w': indice = 22;
+	   case 'x': indice = 23;
+	   case 'y': indice = 24;
+	   case 'z': indice = 25;
+
+	}
+	return indice;
 }

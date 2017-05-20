@@ -21,4 +21,7 @@ public:
 
 };
 
+int dameIndice(char a);
+
+
 #endif /* LISTA_ATOMICA_H__ */
