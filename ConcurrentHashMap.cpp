@@ -9,5 +9,8 @@ void ConcurrentHashMap::addAndInc(string key){
 
 bool ConcurrentHashMap::member(clave key){
 	bool res = false;
+	//me pasan una key
+	//qvq <key,x> existe
+	char primeraLetra = key[0];
 	return res;
 }
