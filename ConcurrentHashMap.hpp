@@ -14,6 +14,7 @@ private:
 	int apariciones;
  	string clave;
 public:
+	ParClaveApariciones(){};
 	ParClaveApariciones(string clave,int apariciones)
 	{
 		this->clave = clave;
@@ -33,16 +34,20 @@ public:
 
 class ConcurrentHashMap{
 private:
-	vector < Lista < ParClaveApariciones > > tabla{26};
 public:
+	vector < Lista < ParClaveApariciones > > tabla{26};
+
 	ConcurrentHashMap(){};//Constructor por defecto
-	
+
 	void addAndInc(string key);
 	bool member(string key);
+	ParClaveApariciones maximum(unsigned int nt);
 
 };
 
 int dameIndice(char a);
+
+ParClaveApariciones obtenerMaximasRepeticiones(Lista<ParClaveApariciones> lista);
 
 
 #endif /* LISTA_ATOMICA_H__ */

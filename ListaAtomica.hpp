@@ -16,8 +16,8 @@ private:
 	};
 
 	std::atomic<Nodo *> _head;
-	mutex mtx;
 public:
+	mutex mtx;
 	Lista() : _head(nullptr) {}
 	~Lista() {
 		Nodo *n, *t;

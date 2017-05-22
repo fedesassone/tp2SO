@@ -1,8 +1,10 @@
 #include "ListaAtomica.hpp"
 #include "ConcurrentHashMap.hpp"
 #include <iostream>
+#include <atomic>
 #include <string>
 #include <mutex>
+#include <thread> 
 
 using namespace std;
 
@@ -11,8 +13,8 @@ void ConcurrentHashMap::addAndInc(string key){
 	int indice = dameIndice(PrimeraLetra);
 	
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
-	mutex mtx;
-	mtx.lock();
+	//mutex mtx;
+	lista->mtx.lock();
 	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 
 	//iterador tiene una lista y un nodo siguiente
@@ -35,7 +37,7 @@ void ConcurrentHashMap::addAndInc(string key){
 		lista->push_front(parNuevo);
 	}
 	
-	mtx.unlock();
+	lista->mtx.unlock();
 	
 }
 
@@ -59,6 +61,47 @@ bool ConcurrentHashMap::member(string key){
 	return res;
 }
 
+ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){
+	ParClaveApariciones resultado;
+	std::thread t[nt];
+	std::atomic<int > siguienteFilaALeer;
+	std::atomic<int > maximasApariciones;
+	siguienteFilaALeer = 0;
+	while(siguienteFilaALeer<26){
+		for (int i = 0; i < nt; ++i){
+		if(siguienteFilaALeer>=26) break;
+		Lista<ParClaveApariciones> *lista = &(this->tabla[siguienteFilaALeer]);
+		siguienteFilaALeer++;
+		atomic<int> *atomicInt =  &siguienteFilaALeer;
+		t[i] = std::thread(obtenerMaximasRepeticiones, lista);
+	 	}
+		
+	}
+
+	//devolver par maximasApariciones
+	//No concurrente con addInc
+	//si con member
+	//nt es #threads
+	//pthread
+	return resultado;
+
+}
+
+//modificar esto de abajo para que sea void y modifiquen el mejor maximo hasta el momento
+
+ParClaveApariciones obtenerMaximasRepeticiones(Lista<ParClaveApariciones> *lista){
+	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
+	ParClaveApariciones resultado = ParClaveApariciones("a",0);
+	ParClaveApariciones parClaveAparicionesActual;
+		while(iterador.HaySiguiente()){
+			parClaveAparicionesActual = iterador.Siguiente();
+			if(parClaveAparicionesActual.dameApariciones() >= resultado.dameApariciones()){
+				resultado = parClaveAparicionesActual;	
+			}
+		iterador.Avanzar();
+	}
+	return resultado;
+}
 
 int dameIndice(char a){
 	int indice;
