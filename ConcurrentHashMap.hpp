@@ -4,6 +4,7 @@
 #include "ListaAtomica.hpp"
 #include <vector>
 #include <string>
+#include <mutex>
 
 using namespace std;
 
@@ -34,6 +35,7 @@ public:
 
 class ConcurrentHashMap{
 private:
+	mutex lockMaximum;
 public:
 	vector < Lista < ParClaveApariciones > > tabla{26};
 
@@ -46,8 +48,7 @@ public:
 };
 
 int dameIndice(char a);
-
-ParClaveApariciones obtenerMaximasRepeticiones(Lista<ParClaveApariciones> lista);
-
+int dameLibre(vector<bool>& v);
+void obtenerMaximasRepeticiones(Lista<ParClaveApariciones> *lista,ParClaveApariciones& maximo);
 
 #endif /* LISTA_ATOMICA_H__ */

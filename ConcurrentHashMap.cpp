@@ -8,6 +8,31 @@
 
 using namespace std;
 
+int dameLibre(vector<bool>& v){
+	for(int i=0;i<v.size();i++)
+	{
+		if(v[i]==true)return i;
+	}
+	return 0; //solo para que no tire warning
+}
+
+
+//modificar esto de abajo para que sea void y modifiquen el mejor maximo hasta el momento
+
+void obtenerMaximasRepeticiones(Lista<ParClaveApariciones> *lista,ParClaveApariciones& maximo){
+	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
+	ParClaveApariciones parClaveAparicionesActual;
+		while(iterador.HaySiguiente()){
+			parClaveAparicionesActual = iterador.Siguiente();
+			lockMaximum.lock();
+			if(parClaveAparicionesActual.dameApariciones() >= maximo.dameApariciones()){
+				maximo = parClaveAparicionesActual;	
+			}
+			lockMaximum.unlock();
+		iterador.Avanzar();
+	}	
+}
+
 void ConcurrentHashMap::addAndInc(string key){
 	char PrimeraLetra = key[0];
 	int indice = dameIndice(PrimeraLetra);
@@ -62,46 +87,34 @@ bool ConcurrentHashMap::member(string key){
 }
 
 ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){
-	ParClaveApariciones resultado;
+	
 	std::thread t[nt];
-	std::atomic<int > siguienteFilaALeer;
-	std::atomic<int > maximasApariciones;
+	std::atomic<int> siguienteFilaALeer;
+	ParClaveApariciones maximo = ParClaveApariciones("a",0);
 	siguienteFilaALeer = 0;
+	std::vector<bool> libres(26,true);
+	// for (int j=0;j<libres->size();j++){
+	// 	libres[j] = true;
+	// }
+	int libre;
 	while(siguienteFilaALeer<26){
-		for (int i = 0; i < nt; ++i){
-		if(siguienteFilaALeer>=26) break;
+
+		libre = dameLibre(libres);
 		Lista<ParClaveApariciones> *lista = &(this->tabla[siguienteFilaALeer]);
 		siguienteFilaALeer++;
-		atomic<int> *atomicInt =  &siguienteFilaALeer;
-		t[i] = std::thread(obtenerMaximasRepeticiones, lista);
-	 	}
-		
+		t[libre] = std::thread(obtenerMaximasRepeticiones(lista,maximo));
+		//t[libre] = new std::thread(obtenerMaximasRepeticiones(lista,maximo));		
 	}
 
-	//devolver par maximasApariciones
-	//No concurrente con addInc
-	//si con member
-	//nt es #threads
-	//pthread
-	return resultado;
+	for(int k=0;k<nt;k++){
+		t[i]->join();
+	}
+
+	return maximo;
 
 }
 
-//modificar esto de abajo para que sea void y modifiquen el mejor maximo hasta el momento
 
-ParClaveApariciones obtenerMaximasRepeticiones(Lista<ParClaveApariciones> *lista){
-	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
-	ParClaveApariciones resultado = ParClaveApariciones("a",0);
-	ParClaveApariciones parClaveAparicionesActual;
-		while(iterador.HaySiguiente()){
-			parClaveAparicionesActual = iterador.Siguiente();
-			if(parClaveAparicionesActual.dameApariciones() >= resultado.dameApariciones()){
-				resultado = parClaveAparicionesActual;	
-			}
-		iterador.Avanzar();
-	}
-	return resultado;
-}
 
 int dameIndice(char a){
 	int indice;
