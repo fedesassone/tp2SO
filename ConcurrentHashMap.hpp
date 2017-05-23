@@ -41,13 +41,13 @@ public:
 
 	ConcurrentHashMap(){};//Constructor por defecto
 
-	void addAndInc(string key);
-	bool member(string key);
+	void addAndInc(const string& key);
+	bool member(const string& key);
 	ParClaveApariciones maximum(unsigned int nt);
-void obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo);
 
 };
 
+void obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo, ConcurrentHashMap& chp);
 int dameIndice(char a);
 int dameLibre(vector<bool>& v);
 

@@ -19,12 +19,12 @@ int dameLibre(vector<bool>& v){
 
 //modificar esto de abajo para que sea void y modifiquen el mejor maximo hasta el momento
 
-void ConcurrentHashMap::obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo){
+void obtenerMaximasRepeticiones(atomic<int>& siguienteFilaALeer, ParClaveApariciones& maximo, ConcurrentHashMap& chp){
 	
-	int actual = fetch_add(siguienteFilaALeer);
+	int actual = atomic_fetch_add(&siguienteFilaALeer, 1);
 
 	while(actual<26){
-		Lista<ParClaveApariciones> *lista = &tabla[actual];
+		Lista<ParClaveApariciones> *lista = &chp.tabla[actual];
 		lista->mtx.lock();
 
 
@@ -40,16 +40,16 @@ void ConcurrentHashMap::obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALe
 			iterador.Avanzar();
 			}	
 		lista->mtx.unlock();	
-		lockMaximum.lock();
+		chp.lockMaximum.lock();
 		if(maximoLocal.dameApariciones() >= maximo.dameApariciones()){
 			maximo = maximoLocal;
 		}	
-		lockMaximum.unlock();
-		actual = fetch_add(siguienteFilaALeer);
+		chp.lockMaximum.unlock();
+		actual = atomic_fetch_add(&siguienteFilaALeer, 1);
 	}
 }
 
-void ConcurrentHashMap::addAndInc(string key){
+void ConcurrentHashMap::addAndInc(const string& key){
 	char PrimeraLetra = key[0];
 	int indice = dameIndice(PrimeraLetra);
 	
@@ -62,27 +62,32 @@ void ConcurrentHashMap::addAndInc(string key){
 	//arranca con esta lista y como nodo siguiente el head de lista.
 	//vamos a iterar una lista de ClaveAparicion
 	bool encontrada = false;
+	cout << "addAndInc: por recorrer lista" << endl;
 	while(iterador.HaySiguiente() && !encontrada){
-		ParClaveApariciones parClaveApariciones = iterador.Siguiente();
+		ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
 		if (parClaveApariciones.dameClave() == key ) 
 		{
 			encontrada = true;
+			cout << "addAndInc: clave encontrada!" << endl;
+			cout << parClaveApariciones.dameApariciones() << endl;
 			parClaveApariciones.aumentarApariciones();
+			cout << parClaveApariciones.dameApariciones() << endl;
 		}
 		iterador.Avanzar();
 	}
-	
+	cout << "addAndInc: lista recorrida" << endl;
 	if(!encontrada)
 	{
 		const ParClaveApariciones parNuevo = ParClaveApariciones(key,1);
 		lista->push_front(parNuevo);
 	}
 	
+	cout << "addAndInc: por hacer unlock" << endl;
 	lista->mtx.unlock();
-	
+	cout << "addAndInc: saliendo..." << endl;
 }
 
-bool ConcurrentHashMap::member(string key){
+bool ConcurrentHashMap::member(const string& key){
 	bool res = false;
 	//me pasan una key
 	//qvq <key,x> existe
@@ -106,30 +111,16 @@ ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){
 	
 	std::thread t[nt];
 	std::atomic<int> siguienteFilaALeer;
-	//std::vector<ParClaveApariciones> maximos[26];
 	ParClaveApariciones maximo = ParClaveApariciones("a",0);
-	std::atomic<int>siguienteFilaALeer;
 	siguienteFilaALeer = 0;
-	//std::vector<bool> libres(26,true);
-	// for (int j=0;j<libres->size();j++){
-	// 	libres[j] = true;
-	// }
-	//int libre;
-	//while(siguienteFilaALeer<26){
 	
-		for (int i = 0; i <nt; ++i)
-		{
-			t[i]=std::thread(obtenerMaximasRepeticiones,siguienteFilaALeer, maximo);
-		}
-
-		//libre = dameLibre(libres);
-		//siguienteFilaALeer++;
-		//t[libre] = std::thread(obtenerMaximasRepeticiones(lista,maximo));
-		//t[libre] = new std::thread(obtenerMaximasRepeticiones(lista,maximo));		
+	for (int i = 0; i <nt; ++i)
+	{
+		t[i]=std::thread(obtenerMaximasRepeticiones,std::ref(siguienteFilaALeer), std::ref(maximo), std::ref(*this));
 	}
 
 	for(int k=0;k<nt;k++){
-		t[i]->join();
+		t[k].join();
 	}
 
 	return maximo;
