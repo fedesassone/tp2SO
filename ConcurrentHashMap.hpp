@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include <list>
 
 using namespace std;
 
@@ -37,6 +38,7 @@ class ConcurrentHashMap{
 private:
 public:
 	mutable std::mutex lockMaximum;
+	mutable std::mutex lockCargar;
 	vector < Lista < ParClaveApariciones > > tabla{26};
 
 	ConcurrentHashMap(){};//Constructor por defecto
@@ -48,12 +50,14 @@ public:
 	  // Move initialization
   ConcurrentHashMap(ConcurrentHashMap&& other) {
     std::lock_guard<std::mutex> lock(other.lockMaximum);
+    std::lock_guard<std::mutex> lock1(other.lockCargar);
     tabla = std::move(other.tabla);
   }
 
   // Copy initialization
   ConcurrentHashMap(const ConcurrentHashMap& other) {
     std::lock_guard<std::mutex> lock(other.lockMaximum);
+    std::lock_guard<std::mutex> lock1(other.lockCargar);
     //tabla = other.tabla;
 
     for(int i = 0;i<other.tabla.size();i++)
@@ -76,8 +80,11 @@ public:
   // Move assignment
   ConcurrentHashMap& operator = (ConcurrentHashMap&& other) {
     std::lock(lockMaximum, other.lockMaximum);
+    std::lock(lockMaximum, other.lockCargar);
     std::lock_guard<std::mutex> self_lock(lockMaximum, std::adopt_lock);
+    std::lock_guard<std::mutex> self_lock1(lockCargar, std::adopt_lock);
     std::lock_guard<std::mutex> other_lock(other.lockMaximum, std::adopt_lock);
+    std::lock_guard<std::mutex> other_lock1(other.lockCargar, std::adopt_lock);
     tabla = std::move(other.tabla);
     return *this;
   }
@@ -85,8 +92,11 @@ public:
   // Copy assignment
   ConcurrentHashMap& operator = (const ConcurrentHashMap& other) {
     std::lock(lockMaximum, other.lockMaximum);
+    std::lock(lockMaximum, other.lockCargar);
     std::lock_guard<std::mutex> self_lock(lockMaximum, std::adopt_lock);
+    std::lock_guard<std::mutex> self_lock1(lockCargar, std::adopt_lock);
     std::lock_guard<std::mutex> other_lock(other.lockMaximum, std::adopt_lock);
+    std::lock_guard<std::mutex> other_lock1(other.lockCargar, std::adopt_lock);
     for(int i = 0;i<other.tabla.size();i++)
     {
     	tabla[i] = other.tabla[i];
@@ -96,7 +106,12 @@ public:
 
 
 };
+void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch);
+void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator pos,list<string>archs);
 ConcurrentHashMap count_words(string arch);
+ConcurrentHashMap count_words_list(list<string>archs);
+ConcurrentHashMap count_words_list_n(unsigned int n,list<string>archs);
+ParClaveApariciones maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
 void obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo, ConcurrentHashMap& chp);
 int dameIndice(char a);
 int dameLibre(vector<bool>& v);

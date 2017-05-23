@@ -6,7 +6,8 @@
 #include <atomic>
 #include <string>
 #include <mutex>
-#include <thread> 
+#include <thread>
+#include <list> 
 
 using namespace std;
 
@@ -180,3 +181,75 @@ ConcurrentHashMap count_words(string arch){
 	}
 	return j;
 }
+
+void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch){
+	ifstream TestEntrada;
+	string aux;
+	TestEntrada.open(arch.c_str());
+	while(!TestEntrada.eof()){
+		TestEntrada >> aux;
+		chp.addAndInc(aux);
+	}
+}
+
+ConcurrentHashMap count_words_list(list<string>archs){
+	 ConcurrentHashMap res;
+	 std::thread t[archs.size()];
+	 list<string>::iterator pos;
+	 pos = archs.begin();
+	 int i = 0;
+	  while( pos != archs.end())
+	  {
+	  	t[i]=std::thread(cargarConcurrentHashMap,std::ref(res),std::ref(*pos));
+	 	cout << *pos << endl;
+	 	pos++;
+	 	i++;
+	  }
+	  	for(int k=0;k<archs.size();k++){
+			t[k].join();
+		}
+
+	 return res;
+}
+
+
+void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator& pos,list<string>archs)
+{
+	chp.lockCargar.lock();
+	list<string>::iterator it = pos;
+	pos ++;
+	chp.lockCargar.unlock();
+	string archivo;
+	while( it != archs.end())
+	{
+		archivo = *it;
+		cargarConcurrentHashMap(chp,archivo);
+		
+		chp.lockCargar.lock();
+		it = pos;
+		pos ++;
+		chp.lockCargar.unlock();
+	}
+
+}
+
+ConcurrentHashMap count_words_list_n(unsigned int n,list<string>archs){
+	ConcurrentHashMap res;
+	std::thread t[n];
+	list<string>::iterator pos;
+	pos = archs.begin();
+	for (int i = 0; i < n; ++i)
+	{
+		t[i]=std::thread(cargarConcurrentHashMapThread,std::ref(res),std::ref(pos),std::ref(archs));
+	}
+
+	for(int k=0;k<n;k++){
+		t[k].join();
+	}
+	return res;
+}
+
+/*ParClaveApariciones maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
+	ConcurrentHashMap chm;
+
+}*/
