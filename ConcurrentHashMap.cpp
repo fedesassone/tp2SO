@@ -19,18 +19,34 @@ int dameLibre(vector<bool>& v){
 
 //modificar esto de abajo para que sea void y modifiquen el mejor maximo hasta el momento
 
-void obtenerMaximasRepeticiones(Lista<ParClaveApariciones> *lista,ParClaveApariciones& maximo){
-	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
-	ParClaveApariciones parClaveAparicionesActual;
-		while(iterador.HaySiguiente()){
-			parClaveAparicionesActual = iterador.Siguiente();
-			lockMaximum.lock();
-			if(parClaveAparicionesActual.dameApariciones() >= maximo.dameApariciones()){
-				maximo = parClaveAparicionesActual;	
-			}
-			lockMaximum.unlock();
-		iterador.Avanzar();
-	}	
+void ConcurrentHashMap::obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo){
+	
+	int actual = fetch_add(siguienteFilaALeer);
+
+	while(actual<26){
+		Lista<ParClaveApariciones> *lista = &tabla[actual];
+		lista->mtx.lock();
+
+
+		Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
+		ParClaveApariciones parClaveAparicionesActual;
+		ParClaveApariciones maximoLocal = ParClaveApariciones("a",0);
+			while(iterador.HaySiguiente()){
+				parClaveAparicionesActual = iterador.Siguiente();
+				if(parClaveAparicionesActual.dameApariciones() >= maximoLocal.dameApariciones()){
+					maximoLocal = parClaveAparicionesActual;	
+				}
+				
+			iterador.Avanzar();
+			}	
+		lista->mtx.unlock();	
+		lockMaximum.lock();
+		if(maximoLocal.dameApariciones() >= maximo.dameApariciones()){
+			maximo = maximoLocal;
+		}	
+		lockMaximum.unlock();
+		actual = fetch_add(siguienteFilaALeer);
+	}
 }
 
 void ConcurrentHashMap::addAndInc(string key){
@@ -90,19 +106,25 @@ ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){
 	
 	std::thread t[nt];
 	std::atomic<int> siguienteFilaALeer;
+	//std::vector<ParClaveApariciones> maximos[26];
 	ParClaveApariciones maximo = ParClaveApariciones("a",0);
+	std::atomic<int>siguienteFilaALeer;
 	siguienteFilaALeer = 0;
-	std::vector<bool> libres(26,true);
+	//std::vector<bool> libres(26,true);
 	// for (int j=0;j<libres->size();j++){
 	// 	libres[j] = true;
 	// }
-	int libre;
-	while(siguienteFilaALeer<26){
+	//int libre;
+	//while(siguienteFilaALeer<26){
+	
+		for (int i = 0; i <nt; ++i)
+		{
+			t[i]=std::thread(obtenerMaximasRepeticiones,siguienteFilaALeer, maximo);
+		}
 
-		libre = dameLibre(libres);
-		Lista<ParClaveApariciones> *lista = &(this->tabla[siguienteFilaALeer]);
-		siguienteFilaALeer++;
-		t[libre] = std::thread(obtenerMaximasRepeticiones(lista,maximo));
+		//libre = dameLibre(libres);
+		//siguienteFilaALeer++;
+		//t[libre] = std::thread(obtenerMaximasRepeticiones(lista,maximo));
 		//t[libre] = new std::thread(obtenerMaximasRepeticiones(lista,maximo));		
 	}
 

@@ -35,8 +35,8 @@ public:
 
 class ConcurrentHashMap{
 private:
-	mutex lockMaximum;
 public:
+	mutex lockMaximum;
 	vector < Lista < ParClaveApariciones > > tabla{26};
 
 	ConcurrentHashMap(){};//Constructor por defecto
@@ -44,11 +44,11 @@ public:
 	void addAndInc(string key);
 	bool member(string key);
 	ParClaveApariciones maximum(unsigned int nt);
+void obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo);
 
 };
 
 int dameIndice(char a);
 int dameLibre(vector<bool>& v);
-void obtenerMaximasRepeticiones(Lista<ParClaveApariciones> *lista,ParClaveApariciones& maximo);
 
 #endif /* LISTA_ATOMICA_H__ */
