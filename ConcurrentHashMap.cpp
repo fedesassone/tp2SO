@@ -172,6 +172,11 @@ int dameIndice(char a){
 ConcurrentHashMap count_words(string arch){
 	ConcurrentHashMap j;
 	ifstream TestEntrada;
+	string aux;
 	TestEntrada.open(arch.c_str());
+	while(!TestEntrada.eof()){
+		TestEntrada >> aux;
+		j.addAndInc(aux);
+	}
 	return j;
 }

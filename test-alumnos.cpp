@@ -37,6 +37,18 @@ int main(void) {
 	cout << endl;
 
 	ConcurrentHashMap i = count_words("prueba");
+	bool result = i.member("hola");
+	cout << result << endl;
+	result = i.member("pepe");
+	cout << result << endl;
+	cout << "por hacer maximum" << endl;
+	maximo = i.maximum(2);
 
+	//test basico de agregar y consultar si está agregado.
+	cout << endl;
+	cout << maximo.dameApariciones() << endl;
+	cout << maximo.dameClave() << endl;
+	cout << endl;
 	return 0;
 }
+
