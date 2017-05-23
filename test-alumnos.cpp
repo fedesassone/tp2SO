@@ -36,5 +36,7 @@ int main(void) {
 	cout << maximo.dameClave() << endl;
 	cout << endl;
 
+	ConcurrentHashMap i = count_words("prueba");
+
 	return 0;
 }

@@ -1,6 +1,8 @@
 #include "ListaAtomica.hpp"
 #include "ConcurrentHashMap.hpp"
 #include <iostream>
+#include <istream>
+#include <fstream>
 #include <atomic>
 #include <string>
 #include <mutex>
@@ -55,7 +57,7 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
 	//mutex mtx;
-	lista->mtx.lock();
+	
 	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 
 	//iterador tiene una lista y un nodo siguiente
@@ -64,6 +66,7 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	bool encontrada = false;
 	cout << "addAndInc: por recorrer lista" << endl;
 	while(iterador.HaySiguiente() && !encontrada){
+		lista->mtx.lock();
 		ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
 		if (parClaveApariciones.dameClave() == key ) 
 		{
@@ -73,6 +76,7 @@ void ConcurrentHashMap::addAndInc(const string& key){
 			parClaveApariciones.aumentarApariciones();
 			cout << parClaveApariciones.dameApariciones() << endl;
 		}
+		lista->mtx.unlock();
 		iterador.Avanzar();
 	}
 	cout << "addAndInc: lista recorrida" << endl;
@@ -83,7 +87,7 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	}
 	
 	cout << "addAndInc: por hacer unlock" << endl;
-	lista->mtx.unlock();
+	
 	cout << "addAndInc: saliendo..." << endl;
 }
 
@@ -162,4 +166,12 @@ int dameIndice(char a){
 
 	}
 	return indice;
+}
+
+
+ConcurrentHashMap count_words(string arch){
+	ConcurrentHashMap j;
+	ifstream TestEntrada;
+	TestEntrada.open(arch.c_str());
+	return j;
 }
