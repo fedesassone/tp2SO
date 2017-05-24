@@ -5,13 +5,13 @@ using namespace std;
 
 int main(void) {
 
-	// ConcurrentHashMap h;
+	 ConcurrentHashMap h;
 
 	// cout << "hashmap construido!" << endl;
-	// h.addAndInc("hola");	
-	// h.addAndInc("hola");	
+	 h.addAndInc("hola");	
+	 h.addAndInc("hola");	
 	// h.addAndInc("hola");
-	// h.addAndInc("a");
+	 h.addAndInc("a");
 	// h.addAndInc("b");
 	// h.addAndInc("c");
 	// h.addAndInc("d");
@@ -25,15 +25,18 @@ int main(void) {
 	// h.addAndInc("m");
 	// h.addAndInc("chau");
 
-	// //bool result = h.member("hola");	
+	bool result = h.member("hola");	
+	cout << result << endl;
+	result = h.member("a");
+	cout << result << endl;
 
-	// cout << "por hacer maximum" << endl;
-	// ParClaveApariciones maximo = h.maximum(2);
+	 cout << "por hacer maximum" << endl;
+	 ParClaveApariciones maximo = h.maximum(2);
 
-	// //test basico de agregar y consultar si está agregado.
+	//test basico de agregar y consultar si está agregado.
 	// cout << endl;
-	// cout << maximo.dameApariciones() << endl;
-	// cout << maximo.dameClave() << endl;
+	 cout << maximo.dameApariciones() << endl;
+	 cout << maximo.dameClave() << endl;
 	// cout << endl;
 
 	// ConcurrentHashMap i = count_words("prueba");
@@ -49,11 +52,11 @@ int main(void) {
 	// cout << maximo.dameApariciones() << endl;
 	// cout << maximo.dameClave() << endl;
 	// cout << endl;
-	list<string> archs;
+	/*list<string> archs;
 	archs.push_back("prueba");
 	archs.push_back("pruebaa");
 
-	ConcurrentHashMap h = count_words_list(archs);
+	ConcurrentHashMap h = count_words_list(archs);*/
 
 	 // bool result = h.member("macri");
 	 // cout << result << endl;

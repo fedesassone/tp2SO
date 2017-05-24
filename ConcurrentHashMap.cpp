@@ -55,9 +55,11 @@ void obtenerMaximasRepeticiones(atomic<int>& siguienteFilaALeer, ParClaveAparici
 void ConcurrentHashMap::addAndInc(const string& key){
 	char PrimeraLetra = key[0];
 	int indice = dameIndice(PrimeraLetra);
+	this->vectorMutex[indice].lock();
 	
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
 	//mutex mtx;
+	//lista->mtx.lock();	
 	
 	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 
@@ -67,7 +69,6 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	bool encontrada = false;
 	cout << "addAndInc: por recorrer lista" << endl;
 	while(iterador.HaySiguiente() && !encontrada){
-		lista->mtx.lock();
 		ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
 		if (parClaveApariciones.dameClave() == key ) 
 		{
@@ -77,7 +78,6 @@ void ConcurrentHashMap::addAndInc(const string& key){
 			parClaveApariciones.aumentarApariciones();
 			cout << parClaveApariciones.dameApariciones() << endl;
 		}
-		lista->mtx.unlock();
 		iterador.Avanzar();
 	}
 	cout << "addAndInc: lista recorrida" << endl;
@@ -89,6 +89,8 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	
 	cout << "addAndInc: por hacer unlock" << endl;
 	
+	//lista->mtx.unlock();
+	this->vectorMutex[indice].unlock();
 	cout << "addAndInc: saliendo..." << endl;
 }
 

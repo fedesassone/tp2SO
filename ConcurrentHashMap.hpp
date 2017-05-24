@@ -41,6 +41,8 @@ public:
 	mutable std::mutex lockCargar;
 	vector < Lista < ParClaveApariciones > > tabla{26};
 
+  mutable vector<mutex> vectorMutex{26};
+
 	ConcurrentHashMap(){};//Constructor por defecto
 
 	void addAndInc(const string& key);
@@ -107,7 +109,7 @@ public:
 
 };
 void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch);
-void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator pos,list<string>archs);
+void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator& pos,list<string>archs);
 ConcurrentHashMap count_words(string arch);
 ConcurrentHashMap count_words_list(list<string>archs);
 ConcurrentHashMap count_words_list_n(unsigned int n,list<string>archs);
