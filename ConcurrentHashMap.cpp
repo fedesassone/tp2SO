@@ -67,31 +67,31 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	//arranca con esta lista y como nodo siguiente el head de lista.
 	//vamos a iterar una lista de ClaveAparicion
 	bool encontrada = false;
-	cout << "addAndInc: por recorrer lista" << endl;
+	//cout << "addAndInc: por recorrer lista" << endl;
 	while(iterador.HaySiguiente() && !encontrada){
 		ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
 		if (parClaveApariciones.dameClave() == key ) 
 		{
 			encontrada = true;
-			cout << "addAndInc: clave encontrada!" << endl;
-			cout << parClaveApariciones.dameApariciones() << endl;
+			//cout << "addAndInc: clave encontrada!" << endl;
+			//cout << parClaveApariciones.dameApariciones() << endl;
 			parClaveApariciones.aumentarApariciones();
-			cout << parClaveApariciones.dameApariciones() << endl;
+			//cout << parClaveApariciones.dameApariciones() << endl;
 		}
 		iterador.Avanzar();
 	}
-	cout << "addAndInc: lista recorrida" << endl;
+	//cout << "addAndInc: lista recorrida" << endl;
 	if(!encontrada)
 	{
 		const ParClaveApariciones parNuevo = ParClaveApariciones(key,1);
 		lista->push_front(parNuevo);
 	}
 	
-	cout << "addAndInc: por hacer unlock" << endl;
+	//cout << "addAndInc: por hacer unlock" << endl;
 	
 	//lista->mtx.unlock();
 	this->vectorMutex[indice].unlock();
-	cout << "addAndInc: saliendo..." << endl;
+	//cout << "addAndInc: saliendo..." << endl;
 }
 
 bool ConcurrentHashMap::member(const string& key){
@@ -181,6 +181,7 @@ ConcurrentHashMap count_words(string arch){
 		TestEntrada >> aux;
 		j.addAndInc(aux);
 	}
+	cout << "despues de while" << endl;
 	return j;
 }
 
@@ -235,7 +236,25 @@ void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator
 
 }
 
-ConcurrentHashMap count_words_list_n(unsigned int n,list<string>archs){
+void cargarConcurrentHashMapThreadMaximum(ConcurrentHashMap& chp,list<string>archs,int desde,int hasta){
+
+	list<string>::iterator pos;
+	int actual = desde;
+	pos = archs.begin();
+	string archivo;
+
+	for (int i=0; i<desde ;i++){//me coloco en la posicion desde
+		pos++;
+	}
+	while(actual <= hasta){
+		archivo = *pos;
+		cargarConcurrentHashMap(chp,archivo);
+		pos++;
+		actual++;
+	}
+}
+
+ConcurrentHashMap count_words_list(unsigned int n,list<string>archs){
 	ConcurrentHashMap res;
 	std::thread t[n];
 	list<string>::iterator pos;
@@ -251,7 +270,23 @@ ConcurrentHashMap count_words_list_n(unsigned int n,list<string>archs){
 	return res;
 }
 
-/*ParClaveApariciones maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
+ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
 	ConcurrentHashMap chm;
+	std::thread t[p_archivos];
+	for (int i = 0; i < p_archivos; ++i)
+	{
+		int desde = i * ( archs.size() / p_archivos );
+		int hasta = (i+1) * ( archs.size() / p_archivos );
+		if ( i == p_archivos - 1 ) hasta = archs.size();
+	 	t[i]=std::thread(cargarConcurrentHashMapThreadMaximum,std::ref(chm),std::ref(archs),std::ref(desde),std::ref(hasta));
+	}
+	ParClaveApariciones res = chm.maximum(p_maximos);
+	return res;
+}
 
-}*/
+ParClaveApariciones maximumConConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
+	ConcurrentHashMap chm = count_words_list(p_archivos,archs);
+	ParClaveApariciones res = chm.maximum(p_maximos);
+	return res;
+
+}

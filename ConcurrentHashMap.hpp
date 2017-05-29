@@ -110,10 +110,12 @@ public:
 };
 void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch);
 void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator& pos,list<string>archs);
+void cargarConcurrentHashMapThreadMaximum(ConcurrentHashMap& chp,list<string>archs,int desde,int hasta);
 ConcurrentHashMap count_words(string arch);
 ConcurrentHashMap count_words_list(list<string>archs);
-ConcurrentHashMap count_words_list_n(unsigned int n,list<string>archs);
-ParClaveApariciones maximum(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
+ConcurrentHashMap count_words_list(unsigned int n,list<string>archs);
+ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
+ParClaveApariciones maximumConConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
 void obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo, ConcurrentHashMap& chp);
 int dameIndice(char a);
 int dameLibre(vector<bool>& v);
