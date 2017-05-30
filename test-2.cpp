@@ -17,6 +17,8 @@ int main(void) {
 		}
 	}
 
+	ParClaveApariciones res = h.maximum(50);
+	cout << res.dameClave() << " " << res.dameApariciones() << endl;
 	return 0;
 }
 

@@ -81,8 +81,7 @@ public:
 
   // Move assignment
   ConcurrentHashMap& operator = (ConcurrentHashMap&& other) {
-    std::lock(lockMaximum, other.lockMaximum);
-    std::lock(lockMaximum, other.lockCargar);
+    std::lock(lockMaximum, other.lockMaximum, lockCargar, other.lockCargar);
     std::lock_guard<std::mutex> self_lock(lockMaximum, std::adopt_lock);
     std::lock_guard<std::mutex> self_lock1(lockCargar, std::adopt_lock);
     std::lock_guard<std::mutex> other_lock(other.lockMaximum, std::adopt_lock);
@@ -94,7 +93,7 @@ public:
   // Copy assignment
   ConcurrentHashMap& operator = (const ConcurrentHashMap& other) {
     std::lock(lockMaximum, other.lockMaximum);
-    std::lock(lockMaximum, other.lockCargar);
+    std::lock(lockCargar, other.lockCargar);
     std::lock_guard<std::mutex> self_lock(lockMaximum, std::adopt_lock);
     std::lock_guard<std::mutex> self_lock1(lockCargar, std::adopt_lock);
     std::lock_guard<std::mutex> other_lock(other.lockMaximum, std::adopt_lock);
@@ -109,8 +108,9 @@ public:
 
 };
 void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch);
-void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator& pos,list<string>archs);
-void cargarConcurrentHashMapThreadMaximum(ConcurrentHashMap& chp,list<string>archs,int desde,int hasta);
+void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator& pos,list<string>& archs);
+void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>& chmps,list<string>& archs, atomic<int>& siguiente);
+void cargarConcurrentHashMapThreadMaximumComputo(std::vector<ConcurrentHashMap>& chmps, std::vector<ParClaveApariciones>& maximos, int , atomic<int>& siguiente, int);
 ConcurrentHashMap count_words(string arch);
 ConcurrentHashMap count_words(list<string>archs);
 ConcurrentHashMap count_words(unsigned int n,list<string>archs);
