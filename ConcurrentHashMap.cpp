@@ -220,31 +220,16 @@ ConcurrentHashMap count_words(list<string>archs){
 }
 
 
-void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator& pos,list<string>& archs)
+void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,atomic<int>& siguiente,list<string>& archs)
 {
-	chp.lockCargar.lock();
-	list<string>::iterator it = pos;
-	if(it == archs.end() ){
-		chp.lockCargar.unlock();
-		return;	
-	} 
-	pos ++;
-	chp.lockCargar.unlock();
-	string archivo;
-	while( it != archs.end())
-	{
-		archivo = *it;
-		cargarConcurrentHashMap(chp,archivo);
-		
-		chp.lockCargar.lock();
-		it = pos;
-		if(it == archs.end() ){
-			chp.lockCargar.unlock();
-			return;	
-		}	 
-		pos ++;
-		chp.lockCargar.unlock();
-	}
+		int actual = atomic_fetch_add(&siguiente, 1);
+		while(actual < archs.size()){
+			auto it = archs.begin();
+			std::advance(it, actual);
+			string archivo(*it);
+			cargarConcurrentHashMap(chp, archivo);
+			actual = atomic_fetch_add(&siguiente, 1);
+		}
 
 }
 	//t[i]=std::thread(cargarConcurrentHashMapThreadMaximum,std::ref(chms),std::ref(archs),std::ref(siguiente), std::ref(lockSiguiente));
@@ -276,11 +261,10 @@ void cargarConcurrentHashMapThreadMaximumComputo(std::vector<ConcurrentHashMap>&
 ConcurrentHashMap count_words(unsigned int n,list<string>archs){
 	ConcurrentHashMap res;
 	std::thread t[n];
-	list<string>::iterator pos;
-	pos = archs.begin();
+	atomic<int> siguiente(0);
 	for (int i = 0; i < n; ++i)
 	{	
-		t[i]=std::thread(cargarConcurrentHashMapThread,std::ref(res),std::ref(pos),std::ref(archs));
+		t[i]=std::thread(cargarConcurrentHashMapThread,std::ref(res),std::ref(siguiente),std::ref(archs));
 
 	}
 
@@ -320,8 +304,12 @@ ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int
 
 	ParClaveApariciones maximo = maximos[0];
 	for(int i = 1; i < maximos.size(); i++){
-		if(maximo.dameApariciones() < maximos[i].dameApariciones())
+		
+		if(maximo.dameApariciones() < maximos[i].dameApariciones()){
 			maximo = maximos[i];
+			cout << "cambie maximo" << endl;
+		} 
+
 	}
 
 	return maximo;

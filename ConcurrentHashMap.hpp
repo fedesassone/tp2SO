@@ -107,7 +107,7 @@ public:
 
 };
 void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch);
-void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,list<string>::iterator& pos,list<string>& archs);
+void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,atomic<int>& siguiente,list<string>& archs);
 void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>& chmps,list<string>& archs, atomic<int>& siguiente);
 void cargarConcurrentHashMapThreadMaximumComputo(std::vector<ConcurrentHashMap>& chmps, std::vector<ParClaveApariciones>& maximos, int , atomic<int>& siguiente, int);
 ConcurrentHashMap count_words(string arch);
