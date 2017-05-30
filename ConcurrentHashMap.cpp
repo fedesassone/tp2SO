@@ -179,10 +179,11 @@ ConcurrentHashMap count_words(string arch){
 	string aux;
 	TestEntrada.open(arch.c_str());
 	while(!TestEntrada.eof()){
+
 		TestEntrada >> aux;
 		j.addAndInc(aux);
 	}
-	cout << "despues de while" << endl;
+	//cout << "despues de while" << endl;
 	return j;
 }
 
@@ -205,7 +206,7 @@ ConcurrentHashMap count_words(list<string>archs){
 	  while( pos != archs.end())
 	  {
 	  	t[i]=std::thread(cargarConcurrentHashMap,std::ref(res),std::ref(*pos));
-	 	cout << *pos << endl;
+	 	//cout << *pos << endl;
 	 	pos++;
 	 	i++;
 	  }
@@ -325,6 +326,7 @@ ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int
 }
 
 ParClaveApariciones maximumConConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
+
 	ConcurrentHashMap chm = count_words(p_archivos,archs);
 	ParClaveApariciones res = chm.maximum(p_maximos);
 	return res;

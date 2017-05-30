@@ -92,8 +92,7 @@ public:
 
   // Copy assignment
   ConcurrentHashMap& operator = (const ConcurrentHashMap& other) {
-    std::lock(lockMaximum, other.lockMaximum);
-    std::lock(lockCargar, other.lockCargar);
+    std::lock(lockMaximum, other.lockMaximum, lockCargar, other.lockCargar);
     std::lock_guard<std::mutex> self_lock(lockMaximum, std::adopt_lock);
     std::lock_guard<std::mutex> self_lock1(lockCargar, std::adopt_lock);
     std::lock_guard<std::mutex> other_lock(other.lockMaximum, std::adopt_lock);
