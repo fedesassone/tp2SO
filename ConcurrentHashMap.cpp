@@ -68,31 +68,31 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	//arranca con esta lista y como nodo siguiente el head de lista.
 	//vamos a iterar una lista de ClaveAparicion
 	bool encontrada = false;
-	//cout << "addAndInc: por recorrer lista" << endl;
+	////cout << "addAndInc: por recorrer lista" << endl;
 	while(iterador.HaySiguiente() && !encontrada){
 		ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
 		if (parClaveApariciones.dameClave() == key ) 
 		{
 			encontrada = true;
-			//cout << "addAndInc: clave encontrada!" << endl;
-			//cout << parClaveApariciones.dameApariciones() << endl;
+			////cout << "addAndInc: clave encontrada!" << endl;
+			////cout << parClaveApariciones.dameApariciones() << endl;
 			parClaveApariciones.aumentarApariciones();
-			//cout << parClaveApariciones.dameApariciones() << endl;
+			////cout << parClaveApariciones.dameApariciones() << endl;
 		}
 		iterador.Avanzar();
 	}
-	//cout << "addAndInc: lista recorrida" << endl;
+	////cout << "addAndInc: lista recorrida" << endl;
 	if(!encontrada)
 	{
 		const ParClaveApariciones parNuevo = ParClaveApariciones(key,1);
 		lista->push_front(parNuevo);
 	}
 	
-	//cout << "addAndInc: por hacer unlock" << endl;
+	////cout << "addAndInc: por hacer unlock" << endl;
 	
 	//lista->mtx.unlock();
 	this->vectorMutex[indice].unlock();
-	//cout << "addAndInc: saliendo..." << endl;
+	////cout << "addAndInc: saliendo..." << endl;
 }
 
 bool ConcurrentHashMap::member(const string& key){
@@ -184,7 +184,7 @@ ConcurrentHashMap count_words(string arch){
 		if(TestEntrada.eof()) break;
 		j.addAndInc(aux);
 	}
-	//cout << "despues de while" << endl;
+	////cout << "despues de while" << endl;
 	return j;
 }
 
@@ -208,7 +208,7 @@ ConcurrentHashMap count_words(list<string>archs){
 	  while( pos != archs.end())
 	  {
 	  	t[i]=std::thread(cargarConcurrentHashMap,std::ref(res),std::ref(*pos));
-	 	//cout << *pos << endl;
+	 	////cout << *pos << endl;
 	 	pos++;
 	 	i++;
 	  }
@@ -232,31 +232,7 @@ void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,atomic<int>& siguiente
 		}
 
 }
-	//t[i]=std::thread(cargarConcurrentHashMapThreadMaximum,std::ref(chms),std::ref(archs),std::ref(siguiente), std::ref(lockSiguiente));
 
-void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>& chmps,list<string>& archs, atomic<int>& siguiente){
-
-	int actual = atomic_fetch_add(&siguiente, 1);
-	while(actual < archs.size()){
-		auto it = archs.begin();
-		std::advance(it, actual);
-		string archivo(*it);
-		cargarConcurrentHashMap(chmps[actual], archivo);
-		actual = atomic_fetch_add(&siguiente, 1);
-	}
-
-}
-
-
-void cargarConcurrentHashMapThreadMaximumComputo(std::vector<ConcurrentHashMap>& chmps, std::vector<ParClaveApariciones>& maximos, int p_maximos, atomic<int>& siguiente, int n){
-
-	int actual = atomic_fetch_add(&siguiente, 1);
-	while(actual < n){
-		maximos[actual] = chmps[actual].maximum(p_maximos);
-		actual = atomic_fetch_add(&siguiente, 1);
-	}
-
-}
 
 ConcurrentHashMap count_words(unsigned int n,list<string>archs){
 	ConcurrentHashMap res;
@@ -275,85 +251,60 @@ ConcurrentHashMap count_words(unsigned int n,list<string>archs){
 	return res;
 }
 
-ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
-	int n = archs.size();
-	std::vector<ConcurrentHashMap> chms(n, ConcurrentHashMap());
-	std::vector<ParClaveApariciones> maximos(n);
-	std::thread t_archivos[p_archivos];
-	std::thread t_maximos[p_maximos];
 
-	atomic<int> siguiente(0);
-	for (int i = 0; i < p_archivos; ++i)
-	{	
-	 	t_archivos[i]=std::thread(cargarConcurrentHashMapThreadMaximumLectura,std::ref(chms),std::ref(archs),std::ref(siguiente));
-	}
-
-	for(int k=0;k<p_archivos;k++){
-			t_archivos[k].join();
-	}
-
-	atomic_store(&siguiente, 0);
-	for (int i = 0; i < p_archivos; ++i)
-	{
-	 	t_maximos[i]=std::thread(cargarConcurrentHashMapThreadMaximumComputo, std::ref(chms), std::ref(maximos), p_maximos, std::ref(siguiente), n);
-	}
-
-	for(int k=0;k<p_archivos;k++){
-			t_maximos[k].join();
-	}	
-
-	ParClaveApariciones maximo = maximos[0];
-	for(int i = 1; i < maximos.size(); i++){
-		
-		if(maximo.dameApariciones() < maximos[i].dameApariciones()){
-			maximo = maximos[i];
-			cout << "cambie maximo" << endl;
-		} 
-
-	}
-
-	return maximo;
-}
-
-void cargarConcurrentHashMapThreadMaximumLectura2(std::vector<ConcurrentHashMap> chms,list<string>archs,int desde,int hasta){
-
-	auto it = archs.begin();
+void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>& chms,list<string>::iterator it,int desde,int hasta){
+	////cout << "DESDE : " << desde << " HASTA : " << hasta << endl;
+	//auto it = archs.begin();
 	std::advance(it, desde);
 	int actual = desde;
-	while( actual <= desde ){
+	while( actual <= hasta ){
+
 		string archivo(*it);
+		////cout << "archivo: " << archivo <<  " actual: " << actual << " hasta: " << hasta << endl;
 		chms[actual] = count_words(archivo);
+		it++;
 		actual++;
 	}
 }
 
-ParClaveApariciones maximumSinConcurrencia2(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
+ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
 	int n = archs.size();
+	////cout << "n: " << n << " p_archivos: " << p_archivos << " p_maximos: " << p_maximos << endl;
+	//for(auto v: archs) //cout << "arch: " << v << endl;
 	std::vector<ConcurrentHashMap> chms(n, ConcurrentHashMap());
 	std::thread t_archivos[p_archivos];
+	auto it = archs.begin();
 	for (int i = 0; i < p_archivos; ++i)
 	{
 		int desde = i * ( archs.size() / p_archivos );
-		int hasta = (i+1) * ( archs.size() / p_archivos );
-		if ( i == p_archivos - 1 ) hasta = archs.size();
-	 	t_archivos[i]=std::thread(cargarConcurrentHashMapThreadMaximumLectura2,std::ref(chms),std::ref(archs),std::ref(desde),std::ref(hasta));
+		////cout << "desde: " << desde << endl;
+		int hasta = (i+1) * ( archs.size() / p_archivos ) - 1;
+		if ( i == p_archivos - 1 ) hasta = archs.size()-1;
+		////cout << "hasta: " << hasta << endl;
+	 	t_archivos[i]=std::thread(cargarConcurrentHashMapThreadMaximumLectura2,std::ref(chms),it,desde,hasta);
 	}
+
+
+
+
+
 	for(int k=0;k<p_archivos;k++){
 			t_archivos[k].join();
 	}
-	std::vector<ParClaveApariciones> maximos(n);
-	for(int l=0;l<n;l++){
-		maximos[l] = chms[l].maximum(p_maximos);
+	int apariciones;
+	for(int i=1;i<n;i++){
+		for (int j = 0; j < 26; j++) {
+			for (auto it = chms[i].tabla[j].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
+				auto t = it.Siguiente();
+				apariciones = t.dameApariciones();
+				for(int r=0;r<apariciones;r++){
+					chms[0].addAndInc(t.dameClave());				
+				}
+			}
+		}
 	}
+	ParClaveApariciones maximo = chms[0].maximum(p_maximos);
 	
-	ParClaveApariciones maximo = maximos[0];
-	for(int i = 1; i < maximos.size(); i++){
-		
-		if(maximo.dameApariciones() < maximos[i].dameApariciones()){
-			maximo = maximos[i];
-		} 
-
-	}
 	return maximo;
 }
 ParClaveApariciones maximumConConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
