@@ -315,6 +315,47 @@ ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int
 	return maximo;
 }
 
+void cargarConcurrentHashMapThreadMaximumLectura2(std::vector<ConcurrentHashMap> chms,list<string>archs,int desde,int hasta){
+
+	auto it = archs.begin();
+	std::advance(it, desde);
+	int actual = desde;
+	while( actual <= desde ){
+		string archivo(*it);
+		chms[actual] = count_words(archivo);
+		actual++;
+	}
+}
+
+ParClaveApariciones maximumSinConcurrencia2(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
+	int n = archs.size();
+	std::vector<ConcurrentHashMap> chms(n, ConcurrentHashMap());
+	std::thread t_archivos[p_archivos];
+	for (int i = 0; i < p_archivos; ++i)
+	{
+		int desde = i * ( archs.size() / p_archivos );
+		int hasta = (i+1) * ( archs.size() / p_archivos );
+		if ( i == p_archivos - 1 ) hasta = archs.size();
+	 	t_archivos[i]=std::thread(cargarConcurrentHashMapThreadMaximumLectura2,std::ref(chms),std::ref(archs),std::ref(desde),std::ref(hasta));
+	}
+	for(int k=0;k<p_archivos;k++){
+			t_archivos[k].join();
+	}
+	std::vector<ParClaveApariciones> maximos(n);
+	for(int l=0;l<n;l++){
+		maximos[l] = chms[l].maximum(p_maximos);
+	}
+	
+	ParClaveApariciones maximo = maximos[0];
+	for(int i = 1; i < maximos.size(); i++){
+		
+		if(maximo.dameApariciones() < maximos[i].dameApariciones()){
+			maximo = maximos[i];
+		} 
+
+	}
+	return maximo;
+}
 ParClaveApariciones maximumConConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
 
 	ConcurrentHashMap chm = count_words(p_archivos,archs);
