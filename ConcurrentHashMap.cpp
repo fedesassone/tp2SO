@@ -195,7 +195,7 @@ void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch){
 	}
 }
 
-ConcurrentHashMap count_words_list(list<string>archs){
+ConcurrentHashMap count_words(list<string>archs){
 	 ConcurrentHashMap res;
 	 std::thread t[archs.size()];
 	 list<string>::iterator pos;
@@ -209,6 +209,7 @@ ConcurrentHashMap count_words_list(list<string>archs){
 	 	i++;
 	  }
 	  	for(int k=0;k<archs.size();k++){
+	  		cout << "Por hacer join" << endl;
 			t[k].join();
 		}
 
@@ -254,19 +255,26 @@ void cargarConcurrentHashMapThreadMaximum(ConcurrentHashMap& chp,list<string>arc
 	}
 }
 
-ConcurrentHashMap count_words_list(unsigned int n,list<string>archs){
+ConcurrentHashMap count_words(unsigned int n,list<string>archs){
 	ConcurrentHashMap res;
 	std::thread t[n];
 	list<string>::iterator pos;
 	pos = archs.begin();
+	cout << "Antes de largar los threads" << endl;
 	for (int i = 0; i < n; ++i)
-	{
+	{	
+		cout << "Por largar thread numero : " << i << endl;
 		t[i]=std::thread(cargarConcurrentHashMapThread,std::ref(res),std::ref(pos),std::ref(archs));
-	}
 
-	for(int k=0;k<n;k++){
-		t[k].join();
 	}
+	cout << "Por joinear" << endl;
+	for(int k=0;k<n;k++){
+		cout << "Entro for del join" << endl;
+		cout << "k : " << k << endl;
+		t[k].join();
+		cout << "Por terminar iteracion del for del join de largar los threads" << endl;
+	}
+	cout << "Despues de joinear" << endl;		
 	return res;
 }
 
@@ -280,12 +288,17 @@ ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int
 		if ( i == p_archivos - 1 ) hasta = archs.size();
 	 	t[i]=std::thread(cargarConcurrentHashMapThreadMaximum,std::ref(chm),std::ref(archs),std::ref(desde),std::ref(hasta));
 	}
+	for(int k=0;k<p_archivos;k++){
+			cout << "Por hacer join" << endl;
+			t[k].join();
+	}
+
 	ParClaveApariciones res = chm.maximum(p_maximos);
 	return res;
 }
 
 ParClaveApariciones maximumConConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
-	ConcurrentHashMap chm = count_words_list(p_archivos,archs);
+	ConcurrentHashMap chm = count_words(p_archivos,archs);
 	ParClaveApariciones res = chm.maximum(p_maximos);
 	return res;
 

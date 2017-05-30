@@ -5,13 +5,13 @@ using namespace std;
 
 int main(void) {
 
-	 ConcurrentHashMap h;
+	 //ConcurrentHashMap h;
 
 	// cout << "hashmap construido!" << endl;
-	 h.addAndInc("hola");	
-	 h.addAndInc("hola");	
+	 //h.addAndInc("hola");	
+	 //h.addAndInc("hola");	
 	// h.addAndInc("hola");
-	 h.addAndInc("a");
+	 //h.addAndInc("a");
 	// h.addAndInc("b");
 	// h.addAndInc("c");
 	// h.addAndInc("d");
@@ -25,27 +25,21 @@ int main(void) {
 	// h.addAndInc("m");
 	// h.addAndInc("chau");
 
-	bool result = h.member("hola");	
-	cout << result << endl;
-	result = h.member("a");
-	cout << result << endl;
+	//bool result = h.member("hola");	
+	//cout << result << endl;
+	//result = h.member("a");
+	//cout << result << endl;
 
-	 cout << "por hacer maximum" << endl;
-	 ParClaveApariciones maximo = h.maximum(2);
+	 //cout << "por hacer maximum" << endl;
+	 //ParClaveApariciones maximo = h.maximum(2);
 
 	//test basico de agregar y consultar si está agregado.
 	// cout << endl;
-	 cout << maximo.dameApariciones() << endl;
-	 cout << maximo.dameClave() << endl;
+	 //cout << maximo.dameApariciones() << endl;
+	 //cout << maximo.dameClave() << endl;
 	// cout << endl;
 
-	// ConcurrentHashMap i = count_words("prueba");
-	// bool result = i.member("hola");
-	// cout << result << endl;
-	// result = i.member("pepe");
-	// cout << result << endl;
-	// cout << "por hacer maximum" << endl;
-	// maximo = i.maximum(2);
+
 
 	// //test basico de agregar y consultar si está agregado.
 	// cout << endl;
@@ -62,6 +56,67 @@ int main(void) {
 	 // cout << result << endl;
 	 // result = h.member("gato");
 	 // cout << result << endl;
+
+	 //****test para probar count_words(string arch) (ej2)
+
+	// ConcurrentHashMap i = count_words("corpus");
+	// bool result = i.member("incorporacion");
+	// cout << "incorporacion pertenece al ConcurrentHashMap ? : " << result << endl;
+	// result = i.member("atenta");
+	// cout << "atenta pertenece al ConcurrentHashMap ? : " << result << endl;
+	
+	//****test para probar count_words(list<string>arch) (ej3)
+	
+	// list<string> archs;
+	// archs.push_back("prueba");
+	// archs.push_back("corpus");
+	// ConcurrentHashMap i = count_words(archs);
+	// bool result = i.member("incorporacion");
+	// cout << "incorporacion pertenece al ConcurrentHashMap ? : " << result << endl;
+	// result = i.member("atenta");
+	// cout << "atenta pertenece al ConcurrentHashMap ? : " << result << endl;
+	// result = i.member("ginebra");
+	// cout << "ginebra pertenece al ConcurrentHashMap ? : " << result << endl;
+	// result = i.member("hola");
+	// cout << "hola pertenece al ConcurrentHashMap ? : " << result << endl;
+	// result = i.member("chau");
+	// cout << "chau pertenece al ConcurrentHashMap ? : " << result << endl;
+	// result = i.member("roto");
+	// cout << "roto pertenece al ConcurrentHashMap ? : " << result << endl;
+	// result = i.member("pepe");
+	// cout << "pepe pertenece al ConcurrentHashMap ? : " << result << endl;
+	
+	
+	//*****test para probar count words(unsigned int n, list<string>archs) (ej4) NO ESTA FUNCIONANDO SE ROMPE EN EL JOIN
+	
+	list<string> archs;
+	archs.push_back("prueba");
+	archs.push_back("corpus");
+	ConcurrentHashMap i = count_words(2,archs);
+	bool result = i.member("incorporacion");
+	cout << "incorporacion pertenece al ConcurrentHashMap ? : " << result << endl;
+	result = i.member("atenta");
+	cout << "atenta pertenece al ConcurrentHashMap ? : " << result << endl;
+	result = i.member("ginebra");
+	cout << "ginebra pertenece al ConcurrentHashMap ? : " << result << endl;
+	result = i.member("hola");
+	cout << "hola pertenece al ConcurrentHashMap ? : " << result << endl;
+	result = i.member("chau");
+	cout << "chau pertenece al ConcurrentHashMap ? : " << result << endl;
+	result = i.member("roto");
+	cout << "roto pertenece al ConcurrentHashMap ? : " << result << endl;
+	result = i.member("pepe");
+	cout << "pepe pertenece al ConcurrentHashMap ? : " << result << endl;
+	
+
+	//*******test para probar maximumSinConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs) (ej5)
+
+	// list<string> archs;
+	// archs.push_back("prueba");
+	// archs.push_back("corpus");
+	// ParClaveApariciones par = maximumSinConcurrencia(2, 2,archs);
+	// cout << "clave maxima : " << par.dameClave() << endl;
+	// cout << "apariciones maxima : " << par.dameApariciones() << endl;
 	return 0;
 }
 
