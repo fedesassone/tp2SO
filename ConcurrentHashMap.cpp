@@ -181,6 +181,7 @@ ConcurrentHashMap count_words(string arch){
 	while(!TestEntrada.eof()){
 
 		TestEntrada >> aux;
+		if(TestEntrada.eof()) break;
 		j.addAndInc(aux);
 	}
 	//cout << "despues de while" << endl;
@@ -193,6 +194,7 @@ void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch){
 	TestEntrada.open(arch.c_str());
 	while(!TestEntrada.eof()){
 		TestEntrada >> aux;
+		if(TestEntrada.eof()) break;
 		chp.addAndInc(aux);
 	}
 }
