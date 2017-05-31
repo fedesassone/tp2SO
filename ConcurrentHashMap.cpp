@@ -281,12 +281,8 @@ ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int
 		int hasta = (i+1) * ( archs.size() / p_archivos ) - 1;
 		if ( i == p_archivos - 1 ) hasta = archs.size()-1;
 		////cout << "hasta: " << hasta << endl;
-	 	t_archivos[i]=std::thread(cargarConcurrentHashMapThreadMaximumLectura2,std::ref(chms),it,desde,hasta);
+	 	t_archivos[i]=std::thread(cargarConcurrentHashMapThreadMaximumLectura,std::ref(chms),it,desde,hasta);
 	}
-
-
-
-
 
 	for(int k=0;k<p_archivos;k++){
 			t_archivos[k].join();

@@ -108,14 +108,11 @@ public:
 };
 void cargarConcurrentHashMap(ConcurrentHashMap& chp,string arch);
 void cargarConcurrentHashMapThread(ConcurrentHashMap& chp,atomic<int>& siguiente,list<string>& archs);
-void cargarConcurrentHashMapThreadMaximumLectura2(std::vector<ConcurrentHashMap>& chms,list<string>::iterator it,int desde,int hasta);
-void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>& chmps,list<string>& archs, atomic<int>& siguiente);
-void cargarConcurrentHashMapThreadMaximumComputo(std::vector<ConcurrentHashMap>& chmps, std::vector<ParClaveApariciones>& maximos, int , atomic<int>& siguiente, int);
+void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>& chms,list<string>::iterator it,int desde,int hasta);
 ConcurrentHashMap count_words(string arch);
 ConcurrentHashMap count_words(list<string>archs);
 ConcurrentHashMap count_words(unsigned int n,list<string>archs);
 ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
-ParClaveApariciones maximumSinConcurrencia2(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
 ParClaveApariciones maximumConConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs);
 void obtenerMaximasRepeticiones(atomic<int> &siguienteFilaALeer, ParClaveApariciones &maximo, ConcurrentHashMap& chp);
 int dameIndice(char a);

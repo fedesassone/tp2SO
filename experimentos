@@ -1,0 +1,10 @@
+1)un archivo grande y muchos chiquitos
+10 archivos 
+threads de 1 a 10
+
+2)muchos archivos de tamaño similar
+la diferencia es en el merge
+
+3)test para probar la lista
+largamos muchos threads que pusheen cosas
+nos fijamos que tse hayan agregado bien todas las cosas que se pushearon
