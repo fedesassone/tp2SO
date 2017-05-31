@@ -100,7 +100,7 @@ void TiemposExp2(int cantIteraciones){
 }
 
 int main(){
-	TiemposExp1(9);
-	//TiemposExp2(3);
+	//TiemposExp1(9);
+	TiemposExp2(25);// MIDE CON 10 ARCHIVOS DEL MISMO TAMAÑO
 	return 0;
 }
