@@ -57,62 +57,45 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	char primeraLetra = key[0];
 	int indice = dameIndice(primeraLetra);
 	this->vectorMutex[indice].lock();
-
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
-	//mutex mtx;
-	//lista->mtx.lock();	
-	
-	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 
-	//iterador tiene una lista y un nodo siguiente
-	//arranca con esta lista y como nodo siguiente el head de lista.
-	//vamos a iterar una lista de ClaveAparicion
-	bool encontrada = false;
-	////cout << "addAndInc: por recorrer lista" << endl;
-	while(iterador.HaySiguiente() && !encontrada){
-		ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
-		if (parClaveApariciones.dameClave() == key ) 
-		{
-			encontrada = true;
-			////cout << "addAndInc: clave encontrada!" << endl;
-			////cout << parClaveApariciones.dameApariciones() << endl;
-			parClaveApariciones.aumentarApariciones();
-			////cout << parClaveApariciones.dameApariciones() << endl;
-		}
-		iterador.Avanzar();
-	}
-	////cout << "addAndInc: lista recorrida" << endl;
-	if(!encontrada)
-	{
-		const ParClaveApariciones parNuevo = ParClaveApariciones(key,1);
+	if(!this->member(key)){
+		//agregar
+		atomic <int> newVal;
+		ParClaveApariciones parNuevo = ParClaveApariciones(key,newVal++);
 		lista->push_front(parNuevo);
+		this->vectorMutex[indice].unlock();
+
+	} else {
+		//incrementar
+		this->vectorMutex[indice].unlock();
+		Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
+		
+		while(iterador.HaySiguiente()){
+			
+			ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
+			
+			if (parClaveApariciones.dameClave() == key ){
+				
+				parClaveApariciones.aumentarApariciones();
+			}
+			iterador.Avanzar();
+		}
 	}
-	
-	////cout << "addAndInc: por hacer unlock" << endl;
-	
-	//lista->mtx.unlock();
-	this->vectorMutex[indice].unlock();
-	////cout << "addAndInc: saliendo..." << endl;
 }
 
 bool ConcurrentHashMap::member(const string& key){
-	bool res = false;
-	//me pasan una key
-	//qvq <key,x> existe
 	char primeraLetra = key[0];
 	int indice = dameIndice(primeraLetra);
-	//ahora buscamos en la tabla si está el par <key,x>
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
 	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
-	//iterador tiene una lista y un nodo siguiente
-	//arranca con esta lista y como nodo siguiente el head de lista.
-	//vamos a iterar una lista de ClaveAparicion
+	
 	while(iterador.HaySiguiente()){
 		ParClaveApariciones parClaveApariciones = iterador.Siguiente();
 		if (parClaveApariciones.dameClave() == key ) return true;
 		iterador.Avanzar();
 	}
-	return res;
+	return false;
 }
 
 ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){

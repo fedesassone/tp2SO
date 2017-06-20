@@ -6,8 +6,8 @@
 using namespace std;
 void pushearNumeros(int desde,int hasta,Lista<int>& lista){
 	for (int i = desde; i <= hasta; i++){
+		cout << "pusheo numero :  " << i <<  endl;
 		lista.push_front(i);
-		//cout << "pusheo numero :  " << i <<  endl;
 	}
 }
 
@@ -27,9 +27,9 @@ int main(void) {
 	for (int i = 0; i < 50; ++i)
 	{
 		int desde = i * ( 100000 / 50 );
-		////cout << "desde: " << desde << endl;
+		//cout << "desde: " << desde << endl;
 		int hasta = (i+1) * ( 100000 / 50 ) - 1;
-		////cout << "hasta: " << hasta << endl;
+		//cout << "hasta: " << hasta << endl;
 	 	t[i]=std::thread(pushearNumeros,desde,hasta,std::ref(lista));
 
 	}

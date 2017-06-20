@@ -13,7 +13,7 @@ using namespace std;
 
 class ParClaveApariciones{
 private:
-	int apariciones;
+	atomic<int> apariciones;
  	string clave;
 public:
 	ParClaveApariciones(){};
