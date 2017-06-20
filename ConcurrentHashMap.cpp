@@ -54,8 +54,8 @@ void obtenerMaximasRepeticiones(atomic<int>& siguienteFilaALeer, ParClaveAparici
 
 void ConcurrentHashMap::addAndInc(const string& key){
 
-	char PrimeraLetra = key[0];
-	int indice = dameIndice(PrimeraLetra);
+	char primeraLetra = key[0];
+	int indice = dameIndice(primeraLetra);
 	this->vectorMutex[indice].lock();
 
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
@@ -142,31 +142,57 @@ int dameIndice(char a){
 	switch(a) 
 	{ 
 	   case 'a': indice = 0;
+	   break;
 	   case 'b': indice = 1;
+	   break;
 	   case 'c': indice = 2;
+	   break;
 	   case 'd': indice = 3;
+	   break;
 	   case 'e': indice = 4;
+	   break;
 	   case 'f': indice = 5;
+	   break;
 	   case 'g': indice = 6;
+	   break;
 	   case 'h': indice = 7;
+	   break;
 	   case 'i': indice = 8;
+	   break;
 	   case 'j': indice = 9;
+	   break;
 	   case 'k': indice = 10;
+	   break;
 	   case 'l': indice = 11;
+	   break;
 	   case 'm': indice = 12;
+	   break;
 	   case 'n': indice = 13;
+	   break;
 	   case 'o': indice = 14;
+	   break;
 	   case 'p': indice = 15;
+	   break;
 	   case 'q': indice = 16;
+	   break;
 	   case 'r': indice = 17;
+	   break;
 	   case 's': indice = 18;
+	   break;
 	   case 't': indice = 19;
+	   break;
 	   case 'u': indice = 20;
+	   break;
 	   case 'v': indice = 21;
+	   break;
 	   case 'w': indice = 22;
+	   break;
 	   case 'x': indice = 23;
+	   break;
 	   case 'y': indice = 24;
+	   break;
 	   case 'z': indice = 25;
+	   break;
 
 	}
 	return indice;

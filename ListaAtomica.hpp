@@ -63,6 +63,10 @@ public:
 
 	void push_front(const T& val) {
 		
+		std::atomic<Nodo *> nuevo;
+		nuevo->_next.store(this->_head);
+		this->_head.store(nuevo);	
+
 		// atomic::
 		// this->_head = atomic<Nodo*> nuevo(new Nodo(val),this->_head);
 		// cabeza = store(..);
@@ -70,12 +74,14 @@ public:
 		// atomic<Nodo*> nuevo(new Nodo(val),this->_head)  = ;
 		// nuevo->_next = _head;
 		/* Completar. Debe ser atómico. */
-		mtx.lock();//lock para agregar a la lista
-		Nodo* nuevo = new Nodo(val);
-		nuevo->_next = _head;//asigno como siguiente del nuevo nodo al primero de la lista
-		this->_head = nuevo;
+		
+		//mtx.lock();//lock para agregar a la lista
+		//Nodo* nuevo = new Nodo(val);
+		//nuevo->_next = _head;//asigno como siguiente del nuevo nodo al primero de la lista
+		//this->_head = nuevo;
 		//atomic_store(&_head, nuevo);
-		mtx.unlock();//ya agregué, entonces unlock
+		//mtx.unlock();//ya agregué, entonces unlock
+
 
 		//this->_head = nuevo;//asign al nuevo nodo como primero de la Lista
 		
