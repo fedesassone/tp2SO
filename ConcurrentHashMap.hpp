@@ -9,16 +9,13 @@
 
 using namespace std;
 
-
-
 class ParClaveApariciones{
 private:
-	atomic<int> apariciones;
+	int apariciones;
  	string clave;
 public:
 	ParClaveApariciones(){};
-	ParClaveApariciones(string clave,int apariciones)
-	{
+	ParClaveApariciones(string clave,int apariciones) {
 		this->clave = clave;
 		this->apariciones = apariciones;
 	}
@@ -31,7 +28,6 @@ public:
 	void aumentarApariciones(){
 		this->apariciones++;
 	}
-
 };
 
 class ConcurrentHashMap{
@@ -60,23 +56,19 @@ public:
   ConcurrentHashMap(const ConcurrentHashMap& other) {
     std::lock_guard<std::mutex> lock(other.lockMaximum);
     std::lock_guard<std::mutex> lock1(other.lockCargar);
-    //tabla = other.tabla;
 
-    for(int i = 0;i<other.tabla.size();i++)
-    {
-    	
-    		Lista < ParClaveApariciones > lista = (other.tabla[i]);
-			Lista< ParClaveApariciones >::Iterador iterador = lista.CrearIt();
-			//iterador tiene una lista y un nodo siguiente
-			//arranca con esta lista y como nodo siguiente el head de lista.
-			//vamos a iterar una lista de ClaveAparicion
-			while(iterador.HaySiguiente()){
-				ParClaveApariciones parClaveApariciones = iterador.Siguiente();
-				tabla[i].push_front(parClaveApariciones);
-				iterador.Avanzar();
-			}
-    	
- 	}
+    for(int i = 0;i<other.tabla.size();i++){
+    	Lista < ParClaveApariciones > lista = (other.tabla[i]);
+  		Lista< ParClaveApariciones >::Iterador iterador = lista.CrearIt();
+  		//iterador tiene una lista y un nodo siguiente
+  		//arranca con esta lista y como nodo siguiente el head de lista.
+  		//vamos a iterar una lista de ClaveAparicion
+  		while(iterador.HaySiguiente()){
+  			ParClaveApariciones parClaveApariciones = iterador.Siguiente();
+  			tabla[i].push_front(parClaveApariciones);
+  			iterador.Avanzar();
+  		}	
+ 	  }
   }
 
   // Move assignment

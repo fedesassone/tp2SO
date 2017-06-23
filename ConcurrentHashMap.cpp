@@ -12,15 +12,11 @@
 using namespace std;
 
 int dameLibre(vector<bool>& v){
-	for(int i=0;i<v.size();i++)
-	{
+	for(int i=0;i<v.size();i++) {
 		if(v[i]==true)return i;
 	}
-	return 0; //solo para que no tire warning
+	return 0; 
 }
-
-
-//modificar esto de abajo para que sea void y modifiquen el mejor maximo hasta el momento
 
 void obtenerMaximasRepeticiones(atomic<int>& siguienteFilaALeer, ParClaveApariciones& maximo, ConcurrentHashMap& chp){
 	
@@ -29,7 +25,6 @@ void obtenerMaximasRepeticiones(atomic<int>& siguienteFilaALeer, ParClaveAparici
 	while(actual<26){
 		Lista<ParClaveApariciones> *lista = &chp.tabla[actual];
 		lista->mtx.lock();
-
 
 		Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 		ParClaveApariciones parClaveAparicionesActual;
@@ -41,7 +36,8 @@ void obtenerMaximasRepeticiones(atomic<int>& siguienteFilaALeer, ParClaveAparici
 				}
 				
 			iterador.Avanzar();
-			}	
+			}
+
 		lista->mtx.unlock();	
 		chp.lockMaximum.lock();
 		if(maximoLocal.dameApariciones() >= maximo.dameApariciones()){
@@ -61,8 +57,7 @@ void ConcurrentHashMap::addAndInc(const string& key){
 
 	if(!this->member(key)){
 		//agregar
-		atomic <int> newVal;
-		ParClaveApariciones parNuevo = ParClaveApariciones(key,newVal++);
+		ParClaveApariciones parNuevo = ParClaveApariciones(key,1);
 		lista->push_front(parNuevo);
 		this->vectorMutex[indice].unlock();
 
@@ -72,11 +67,10 @@ void ConcurrentHashMap::addAndInc(const string& key){
 		Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 		
 		while(iterador.HaySiguiente()){
-			
+
 			ParClaveApariciones& parClaveApariciones = iterador.Siguiente();
-			
+
 			if (parClaveApariciones.dameClave() == key ){
-				
 				parClaveApariciones.aumentarApariciones();
 			}
 			iterador.Avanzar();
@@ -105,8 +99,7 @@ ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){
 	ParClaveApariciones maximo = ParClaveApariciones("a",0);
 	siguienteFilaALeer = 0;
 	
-	for (int i = 0; i <nt; ++i)
-	{
+	for (int i = 0; i <nt; ++i) {
 		t[i]=std::thread(obtenerMaximasRepeticiones,std::ref(siguienteFilaALeer), std::ref(maximo), std::ref(*this));
 	}
 
@@ -115,7 +108,6 @@ ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){
 	}
 
 	return maximo;
-
 }
 
 
@@ -193,7 +185,6 @@ ConcurrentHashMap count_words(string arch){
 		if(TestEntrada.eof()) break;
 		j.addAndInc(aux);
 	}
-	////cout << "despues de while" << endl;
 	return j;
 }
 
@@ -217,7 +208,6 @@ ConcurrentHashMap count_words(list<string>archs){
 	  while( pos != archs.end())
 	  {
 	  	t[i]=std::thread(cargarConcurrentHashMap,std::ref(res),std::ref(*pos));
-	 	////cout << *pos << endl;
 	 	pos++;
 	 	i++;
 	  }
@@ -247,8 +237,7 @@ ConcurrentHashMap count_words(unsigned int n,list<string>archs){
 	ConcurrentHashMap res;
 	std::thread t[n];
 	atomic<int> siguiente(0);
-	for (int i = 0; i < n; ++i)
-	{	
+	for (int i = 0; i < n; ++i) {	
 		t[i]=std::thread(cargarConcurrentHashMapThread,std::ref(res),std::ref(siguiente),std::ref(archs));
 
 	}
@@ -262,14 +251,12 @@ ConcurrentHashMap count_words(unsigned int n,list<string>archs){
 
 
 void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>& chms,list<string>::iterator it,int desde,int hasta){
-	////cout << "DESDE : " << desde << " HASTA : " << hasta << endl;
-	//auto it = archs.begin();
+
 	std::advance(it, desde);
 	int actual = desde;
 	while( actual <= hasta ){
 
 		string archivo(*it);
-		////cout << "archivo: " << archivo <<  " actual: " << actual << " hasta: " << hasta << endl;
 		chms[actual] = count_words(archivo);
 		it++;
 		actual++;
@@ -278,18 +265,14 @@ void cargarConcurrentHashMapThreadMaximumLectura(std::vector<ConcurrentHashMap>&
 
 ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int p_maximos, list<string>archs){
 	int n = archs.size();
-	////cout << "n: " << n << " p_archivos: " << p_archivos << " p_maximos: " << p_maximos << endl;
-	//for(auto v: archs) //cout << "arch: " << v << endl;
 	std::vector<ConcurrentHashMap> chms(n, ConcurrentHashMap());
 	std::thread t_archivos[p_archivos];
 	auto it = archs.begin();
 	for (int i = 0; i < p_archivos; ++i)
 	{
 		int desde = i * ( archs.size() / p_archivos );
-		////cout << "desde: " << desde << endl;
 		int hasta = (i+1) * ( archs.size() / p_archivos ) - 1;
 		if ( i == p_archivos - 1 ) hasta = archs.size()-1;
-		////cout << "hasta: " << hasta << endl;
 	 	t_archivos[i]=std::thread(cargarConcurrentHashMapThreadMaximumLectura,std::ref(chms),it,desde,hasta);
 	}
 
