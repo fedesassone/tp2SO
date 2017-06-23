@@ -28,7 +28,7 @@ void obtenerMaximasRepeticiones(atomic<int>& siguienteFilaALeer, ParClaveAparici
 
 		Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 		ParClaveApariciones parClaveAparicionesActual;
-		ParClaveApariciones maximoLocal = ParClaveApariciones("a",0);
+		ParClaveApariciones maximoLocal("a",0);
 			while(iterador.HaySiguiente()){
 				parClaveAparicionesActual = iterador.Siguiente();
 				if(parClaveAparicionesActual.dameApariciones() >= maximoLocal.dameApariciones()){
@@ -57,7 +57,7 @@ void ConcurrentHashMap::addAndInc(const string& key){
 
 	if(!this->member(key)){
 		//agregar
-		ParClaveApariciones parNuevo = ParClaveApariciones(key,1);
+		ParClaveApariciones parNuevo(key,1);
 		lista->push_front(parNuevo);
 		this->vectorMutex[indice].unlock();
 
@@ -96,7 +96,7 @@ ParClaveApariciones ConcurrentHashMap::maximum(unsigned int nt){
 	
 	std::thread t[nt];
 	std::atomic<int> siguienteFilaALeer;
-	ParClaveApariciones maximo = ParClaveApariciones("a",0);
+	ParClaveApariciones maximo("a",0);
 	siguienteFilaALeer = 0;
 	
 	for (int i = 0; i <nt; ++i) {

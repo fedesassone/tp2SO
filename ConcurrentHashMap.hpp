@@ -11,22 +11,47 @@ using namespace std;
 
 class ParClaveApariciones{
 private:
-	int apariciones;
+	atomic<int> apariciones;
  	string clave;
 public:
 	ParClaveApariciones(){};
 	ParClaveApariciones(string clave,int apariciones) {
 		this->clave = clave;
-		this->apariciones = apariciones;
+		this->apariciones.store(apariciones);
 	}
+
+  ParClaveApariciones(const ParClaveApariciones& other){
+    this->clave = other.clave;
+    this->apariciones.store(other.apariciones.load());
+  }
+
+  ParClaveApariciones(ParClaveApariciones&& other){
+    this->clave = "";
+    std::swap(this->clave, other.clave);
+    this->apariciones.store(other.apariciones.load());
+  }
+
+  ParClaveApariciones& operator=(const ParClaveApariciones& other){
+    this->clave = other.clave;
+    this->apariciones.store(other.apariciones.load());
+    return *this;
+  }
+
+  ParClaveApariciones& operator=(ParClaveApariciones&& other){
+    this->clave = "";
+    std::swap(this->clave, other.clave);
+    this->apariciones.store(other.apariciones.load());
+    return *this;
+  }
+
 	string dameClave(){
 		return this->clave;
 	}
 	int dameApariciones(){
-		return this->apariciones;
+		return apariciones.load();
 	}
 	void aumentarApariciones(){
-		this->apariciones++;
+		apariciones.fetch_add(1);
 	}
 };
 
