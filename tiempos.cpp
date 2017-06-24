@@ -87,7 +87,11 @@ void TiemposExp2(int cantIteraciones){
 		}
 		std::sort(tiempos.begin(), tiempos.end());//ordeno para saber la mediana
 		myfile << j << ";";
-		myfile << tiempos.at(tiempos.size()/2).count() << ";";//pongo la mediana de maximoConConcurrencia con p_archivos = j	
+		if(tiempos.size() % 2)
+			myfile << (tiempos.at(tiempos.size()/2).count() + tiempos.at(tiempos.size()/2 + 1).count()) / 2 << ";";//pongo la mediana de maximoSinConcurrencia con p_archivos = j
+		else
+			myfile << tiempos.at(tiempos.size()/2 + 1).count() << ";";
+
 		for(int i = 0; i<cantIteraciones ;i++){//hago 50 iteraciones para despues tomar la mediana
 			auto start = TIMESTAMP();
 			p = maximumConConcurrencia(j, 10,l);
@@ -95,12 +99,58 @@ void TiemposExp2(int cantIteraciones){
 			tiempos[i] = chrono::duration_cast<chrono::GRANULARIDAD>(end - start) ;
 		}
 		std::sort(tiempos.begin(), tiempos.end());//ordeno para saber la mediana
-		myfile << tiempos.at(tiempos.size()/2).count() << ";\n";//pongo la mediana de maximoSinConcurrencia con p_archivos = j
+		if(tiempos.size() % 2)
+			myfile << (tiempos.at(tiempos.size()/2).count() + tiempos.at(tiempos.size()/2 + 1).count()) / 2 << ";\n";//pongo la mediana de maximoSinConcurrencia con p_archivos = j
+		else
+			myfile << tiempos.at(tiempos.size()/2 + 1).count() << ";\n";
+	}
+}
+
+void TiemposExp3(int cantIteraciones){   
+	
+	auto max_threads = 26;
+
+	ofstream myfile;
+	myfile.open("TiemposExp3.csv");
+	list<string> l = {"corpus-letra-0",  "corpus-letra-1",  "corpus-letra-2",  "corpus-letra-3",  "corpus-letra-4",  "corpus-letra-5",  "corpus-letra-6",  "corpus-letra-7",  "corpus-letra-8",  "corpus-letra-9",  "corpus-letra-10",  "corpus-letra-11",  "corpus-letra-12",  "corpus-letra-13",  "corpus-letra-14",  "corpus-letra-15",  "corpus-letra-16",  "corpus-letra-17",  "corpus-letra-18",  "corpus-letra-19",  "corpus-letra-20",  "corpus-letra-21",  "corpus-letra-22",  "corpus-letra-23",  "corpus-letra-24",  "corpus-letra-25" };
+	myfile << "Cantidad de p_archivos;";
+	myfile << "Sin concurrencia;";
+	myfile << "Con concurrencia;\n";
+	ParClaveApariciones p;
+	vector< chrono::GRANULARIDAD >  tiempos(cantIteraciones);//vector donde voy poniendo los tiempos de las iteraciones para luego calcularle la mediana
+	for(int j=1; j<=max_threads; j++){// j es p_archivos 
+		cout << " Midiendo con p_archivos: " << j << endl;
+		for(int i = 0; i<cantIteraciones ;i++){//hago 50 iteraciones para despues tomar la mediana
+			
+			auto start = TIMESTAMP();
+			p = maximumSinConcurrencia(j, 10,l);
+			auto end = TIMESTAMP();
+			tiempos[i] = chrono::duration_cast<chrono::GRANULARIDAD>(end - start) ;
+		}
+		std::sort(tiempos.begin(), tiempos.end());//ordeno para saber la mediana
+		myfile << j << ";";
+		if(tiempos.size() % 2)
+			myfile << (tiempos.at(tiempos.size()/2).count() + tiempos.at(tiempos.size()/2 + 1).count()) / 2 << ";";//pongo la mediana de maximoSinConcurrencia con p_archivos = j
+		else
+			myfile << tiempos.at(tiempos.size()/2 + 1).count() << ";";
+
+		for(int i = 0; i<cantIteraciones ;i++){//hago 50 iteraciones para despues tomar la mediana
+			auto start = TIMESTAMP();
+			p = maximumConConcurrencia(j, 10,l);
+			auto end = TIMESTAMP();
+			tiempos[i] = chrono::duration_cast<chrono::GRANULARIDAD>(end - start) ;
+		}
+		std::sort(tiempos.begin(), tiempos.end());//ordeno para saber la mediana
+		if(tiempos.size() % 2)
+			myfile << (tiempos.at(tiempos.size()/2).count() + tiempos.at(tiempos.size()/2 + 1).count()) / 2 << ";\n";//pongo la mediana de maximoSinConcurrencia con p_archivos = j
+		else
+			myfile << tiempos.at(tiempos.size()/2 + 1).count() << ";\n";
 	}
 }
 
 int main(){
 	//TiemposExp1(9);
-	TiemposExp2(25);// MIDE CON 10 ARCHIVOS DEL MISMO TAMAÑO
+	//TiemposExp2(25);// MIDE CON 10 ARCHIVOS DEL MISMO TAMAÑO
+	TiemposExp3(25);
 	return 0;
 }
