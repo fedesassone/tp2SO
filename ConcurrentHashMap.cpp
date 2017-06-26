@@ -52,18 +52,13 @@ void ConcurrentHashMap::addAndInc(const string& key){
 
 	char primeraLetra = key[0];
 	int indice = dameIndice(primeraLetra);
-	this->vectorMutex[indice].lock();
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
 
 	if(!this->member(key)){
 		//agregar
-		ParClaveApariciones parNuevo(key,1);
-		lista->push_front(parNuevo);
-		this->vectorMutex[indice].unlock();
-
+		lista->push_front(ParClaveApariciones(key,1));
 	} else {
 		//incrementar
-		this->vectorMutex[indice].unlock();
 		Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 		
 		while(iterador.HaySiguiente()){
@@ -72,6 +67,7 @@ void ConcurrentHashMap::addAndInc(const string& key){
 
 			if (parClaveApariciones.dameClave() == key ){
 				parClaveApariciones.aumentarApariciones();
+				break;
 			}
 			iterador.Avanzar();
 		}
@@ -82,13 +78,19 @@ bool ConcurrentHashMap::member(const string& key){
 	char primeraLetra = key[0];
 	int indice = dameIndice(primeraLetra);
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
+
+	this->vectorMutex[indice].lock();	
 	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
-	
+
 	while(iterador.HaySiguiente()){
 		ParClaveApariciones parClaveApariciones = iterador.Siguiente();
-		if (parClaveApariciones.dameClave() == key ) return true;
+		if (parClaveApariciones.dameClave() == key ) {
+			this->vectorMutex[indice].unlock();	
+			return true;
+		}
 		iterador.Avanzar();
 	}
+	this->vectorMutex[indice].unlock();	
 	return false;
 }
 

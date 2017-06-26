@@ -30,8 +30,6 @@ public:
 		}
 	}
 
-
-
 	// Move initialization
   Lista(Lista&& other) {
     std::lock_guard<std::mutex> lock(other.mtx);
