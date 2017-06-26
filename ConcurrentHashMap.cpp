@@ -53,11 +53,14 @@ void ConcurrentHashMap::addAndInc(const string& key){
 	char primeraLetra = key[0];
 	int indice = dameIndice(primeraLetra);
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
-
+	this->vectorMutex[indice].lock();
 	if(!this->member(key)){
 		//agregar
 		lista->push_front(ParClaveApariciones(key,1));
+		this->vectorMutex[indice].unlock();	
+
 	} else {
+		this->vectorMutex[indice].unlock();	
 		//incrementar
 		Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 		
@@ -78,19 +81,17 @@ bool ConcurrentHashMap::member(const string& key){
 	char primeraLetra = key[0];
 	int indice = dameIndice(primeraLetra);
 	Lista < ParClaveApariciones > *lista = &tabla[indice];
-
-	this->vectorMutex[indice].lock();	
+	
 	Lista< ParClaveApariciones >::Iterador iterador = lista->CrearIt();
 
 	while(iterador.HaySiguiente()){
 		ParClaveApariciones parClaveApariciones = iterador.Siguiente();
 		if (parClaveApariciones.dameClave() == key ) {
-			this->vectorMutex[indice].unlock();	
+			
 			return true;
 		}
 		iterador.Avanzar();
 	}
-	this->vectorMutex[indice].unlock();	
 	return false;
 }
 
@@ -282,6 +283,7 @@ ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int
 			t_archivos[k].join();
 	}
 	int apariciones;
+	if(n!=1){
 	for(int i=1;i<n;i++){
 		for (int j = 0; j < 26; j++) {
 			for (auto it = chms[i].tabla[j].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
@@ -293,6 +295,7 @@ ParClaveApariciones maximumSinConcurrencia(unsigned int p_archivos, unsigned int
 			}
 		}
 	}
+}
 	ParClaveApariciones maximo = chms[0].maximum(p_maximos);
 	
 	return maximo;

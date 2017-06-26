@@ -147,10 +147,50 @@ void TiemposExp3(int cantIteraciones){
 			myfile << tiempos.at(tiempos.size()/2 + 1).count() << ";\n";
 	}
 }
+void TiemposExp4(int cantIteraciones){   
+	
+	ofstream myfile;
+	myfile.open("TiemposExp4.csv");
+	list<string> l = { "corpus-letra-A-0","corpus-letra-A-1","corpus-letra-A-2","corpus-letra-A-3","corpus-letra-A-4","corpus-letra-A-5","corpus-letra-A-6","corpus-letra-A-7" };
+	myfile << "Cantidad de p_archivos;";
+	myfile << "Sin concurrencia;";
+	myfile << "Con concurrencia;\n";
+	ParClaveApariciones p;
+	vector< chrono::GRANULARIDAD >  tiempos(cantIteraciones);//vector donde voy poniendo los tiempos de las iteraciones para luego calcularle la mediana
+	for(int j=1; j<=8; j++){// j es p_archivos 
+		cout << " Midiendo con p_archivos: " << j << endl;
+		for(int i = 0; i<cantIteraciones ;i++){//hago 50 iteraciones para despues tomar la mediana
+			
+			auto start = TIMESTAMP();
+			p = maximumSinConcurrencia(j,10,l);
+			auto end = TIMESTAMP();
+			tiempos[i] = chrono::duration_cast<chrono::GRANULARIDAD>(end - start) ;
+		}
+		std::sort(tiempos.begin(), tiempos.end());//ordeno para saber la mediana
+		myfile << j << ";";
+		if(tiempos.size() % 2)
+			myfile << (tiempos.at(tiempos.size()/2).count() + tiempos.at(tiempos.size()/2 + 1).count()) / 2 << ";";//pongo la mediana de maximoSinConcurrencia con p_archivos = j
+		else
+			myfile << tiempos.at(tiempos.size()/2 + 1).count() << ";";
+
+		for(int i = 0; i<cantIteraciones ;i++){//hago 50 iteraciones para despues tomar la mediana
+			auto start = TIMESTAMP();
+			p = maximumConConcurrencia(j,10,l);
+			auto end = TIMESTAMP();
+			tiempos[i] = chrono::duration_cast<chrono::GRANULARIDAD>(end - start) ;
+		}
+		std::sort(tiempos.begin(), tiempos.end());//ordeno para saber la mediana
+		if(tiempos.size() % 2)
+			myfile << (tiempos.at(tiempos.size()/2).count() + tiempos.at(tiempos.size()/2 + 1).count()) / 2 << ";\n";//pongo la mediana de maximoSinConcurrencia con p_archivos = j
+		else
+			myfile << tiempos.at(tiempos.size()/2 + 1).count() << ";\n";
+	}
+}
 
 int main(){
 	//TiemposExp1(3);
-	TiemposExp2(3);// MIDE CON 10 ARCHIVOS DEL MISMO TAMAÑO
+	TiemposExp2(20);// MIDE CON 10 ARCHIVOS DEL MISMO TAMAÑO
 	//TiemposExp3(25);
+	//TiemposExp4(5);
 	return 0;
 }
