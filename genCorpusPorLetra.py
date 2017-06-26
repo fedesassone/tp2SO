@@ -13,8 +13,9 @@ if __name__ == "__main__":
 	with open(sys.argv[1]) as f:
 		lines = f.readlines()
 		for palabra in lines:
-			hash_func = ord(palabra[0]) - ord('a')
-			palabras[hash_func].append(palabra.replace("\n", ""))
+			if len(palabra) > 0:
+				hash_func = ord(palabra[0]) - ord('a')
+				palabras[hash_func].append(palabra.replace("\n", ""))
 
 
 	#generar archivos
