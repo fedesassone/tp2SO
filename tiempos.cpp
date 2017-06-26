@@ -189,8 +189,8 @@ void TiemposExp4(int cantIteraciones){
 
 int main(){
 	//TiemposExp1(3);
-	TiemposExp2(20);// MIDE CON 10 ARCHIVOS DEL MISMO TAMAÑO
+	//TiemposExp2(20);// MIDE CON 10 ARCHIVOS DEL MISMO TAMAÑO
 	//TiemposExp3(25);
-	//TiemposExp4(5);
+	TiemposExp4(5);
 	return 0;
 }
